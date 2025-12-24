@@ -1,0 +1,565 @@
+<Window x:Class="JsonTool.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:avalonEdit="http://icsharpcode.net/sharpdevelop/avalonedit"
+        xmlns:local="clr-namespace:JsonTool.Views"
+        mc:Ignorable="d"
+        Title="JSON Schema Tool" Height="800" Width="1200"
+        WindowStartupLocation="CenterScreen"
+        Background="#1E1E1E"
+        Closing="Window_Closing">
+    
+    <Window.InputBindings>
+        <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenFileCommand}"/>
+        <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveFileCommand}"/>
+        <KeyBinding Key="Z" Modifiers="Ctrl" Command="{Binding UndoCommand}"/>
+        <KeyBinding Key="Y" Modifiers="Ctrl" Command="{Binding RedoCommand}"/>
+        <KeyBinding Key="F5" Command="{Binding ValidateSchemaCommand}"/>
+    </Window.InputBindings>
+    
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility"/>
+        
+        <Style TargetType="Button" x:Key="ToolbarButton">
+            <Setter Property="Background" Value="#3C3C3C"/>
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+            <Setter Property="BorderBrush" Value="#555555"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="FontWeight" Value="Normal"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#0078D4"/>
+                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                    <Setter Property="BorderBrush" Value="#0078D4"/>
+                </Trigger>
+                <Trigger Property="IsPressed" Value="True">
+                    <Setter Property="Background" Value="#005A9E"/>
+                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                </Trigger>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Opacity" Value="0.5"/>
+                    <Setter Property="Foreground" Value="#888888"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="ToggleButton" x:Key="ToolbarToggleButton">
+            <Setter Property="Background" Value="#3C3C3C"/>
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+            <Setter Property="BorderBrush" Value="#555555"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,6"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#4A4A4A"/>
+                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                    <Setter Property="BorderBrush" Value="#0078D4"/>
+                </Trigger>
+                <Trigger Property="IsChecked" Value="True">
+                    <Setter Property="Background" Value="#0078D4"/>
+                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                    <Setter Property="BorderBrush" Value="#0078D4"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="LabelStyle">
+            <Setter Property="Foreground" Value="#CCCCCC"/>
+            <Setter Property="Margin" Value="0,0,0,4"/>
+        </Style>
+
+        <Style TargetType="TextBox" x:Key="InputStyle">
+            <Setter Property="Background" Value="#2D2D2D"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#555555"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="CaretBrush" Value="#FFFFFF"/>
+        </Style>
+
+        <Style TargetType="ComboBox" x:Key="ComboStyle">
+            <Setter Property="Background" Value="#3C3C3C"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="BorderBrush" Value="#555555"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Style.Resources>
+                <SolidColorBrush x:Key="{x:Static SystemColors.WindowBrushKey}" Color="#3C3C3C"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#0078D4"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.ControlBrushKey}" Color="#3C3C3C"/>
+                <SolidColorBrush x:Key="{x:Static SystemColors.WindowTextBrushKey}" Color="#FFFFFF"/>
+            </Style.Resources>
+            <Style.Triggers>
+                <Trigger Property="IsEditable" Value="True">
+                    <Setter Property="IsTextSearchEnabled" Value="False"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style TargetType="TextBox" x:Key="ComboBoxTextBoxStyle">
+            <Setter Property="Background" Value="#3C3C3C"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="CaretBrush" Value="#FFFFFF"/>
+        </Style>
+        
+        <Style TargetType="ComboBoxItem">
+            <Setter Property="Background" Value="#2D2D2D"/>
+            <Setter Property="Foreground" Value="#FFFFFF"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Style.Triggers>
+                <Trigger Property="IsHighlighted" Value="True">
+                    <Setter Property="Background" Value="#0078D4"/>
+                    <Setter Property="Foreground" Value="#FFFFFF"/>
+                </Trigger>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#3E3E3E"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        
+        <Style TargetType="MenuItem" x:Key="MenuItemStyle">
+            <Setter Property="Foreground" Value="#CCCCCC"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Menu Bar -->
+        <Menu Grid.Row="0" Background="#2D2D2D" Foreground="#CCCCCC" Padding="4">
+            <MenuItem Header="_File" Foreground="#CCCCCC">
+                <MenuItem Header="_Open..." Command="{Binding OpenFileCommand}" InputGestureText="Ctrl+O">
+                    <MenuItem.Icon>
+                        <TextBlock Text="📂" FontSize="14"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Save" Command="{Binding SaveFileCommand}" InputGestureText="Ctrl+S">
+                    <MenuItem.Icon>
+                        <TextBlock Text="💾" FontSize="14"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Save _As..." Command="{Binding SaveAsFileCommand}"/>
+                <Separator/>
+                <MenuItem Header="_Auto-save" IsCheckable="True" IsChecked="{Binding IsAutoSaveEnabled}"/>
+                <Separator/>
+                <MenuItem Header="Recent Files" ItemsSource="{Binding RecentFiles}">
+                    <MenuItem.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding}"/>
+                        </DataTemplate>
+                    </MenuItem.ItemTemplate>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="E_xit" Click="Exit_Click" InputGestureText="Alt+F4"/>
+            </MenuItem>
+            
+            <MenuItem Header="_Edit" Foreground="#CCCCCC">
+                <MenuItem Header="_Undo" Command="{Binding UndoCommand}" InputGestureText="Ctrl+Z">
+                    <MenuItem.Icon>
+                        <TextBlock Text="↩" FontSize="14"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Redo" Command="{Binding RedoCommand}" InputGestureText="Ctrl+Y">
+                    <MenuItem.Icon>
+                        <TextBlock Text="↪" FontSize="14"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Undo History" ItemsSource="{Binding UndoHistory}">
+                    <MenuItem.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Description}"/>
+                        </DataTemplate>
+                    </MenuItem.ItemTemplate>
+                </MenuItem>
+            </MenuItem>
+            
+            <MenuItem Header="_Tools" Foreground="#CCCCCC">
+                <MenuItem Header="_Validate Schema" Command="{Binding ValidateSchemaCommand}" InputGestureText="F5">
+                    <MenuItem.Icon>
+                        <TextBlock Text="✓" FontSize="14"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="Check _JSON Data..." Command="{Binding ValidateDataCommand}">
+                    <MenuItem.Icon>
+                        <TextBlock Text="📋" FontSize="14"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Export to _Markdown..." Command="{Binding ExportMarkdownCommand}">
+                    <MenuItem.Icon>
+                        <TextBlock Text="📝" FontSize="14"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <MenuItem Header="_Flat View" IsCheckable="True" IsChecked="{Binding IsFlatView}">
+                    <MenuItem.Icon>
+                        <TextBlock Text="☰" FontSize="14"/>
+                    </MenuItem.Icon>
+                </MenuItem>
+                <Separator/>
+                <MenuItem Header="Format JSON" Command="{Binding FormatJsonCommand}" InputGestureText="Ctrl+Shift+F"/>
+                <MenuItem Header="Minify JSON" Command="{Binding MinifyJsonCommand}"/>
+            </MenuItem>
+            
+            <MenuItem Header="_View" Foreground="#CCCCCC">
+                <MenuItem Header="Show _Properties Panel" IsCheckable="True" IsChecked="{Binding IsPropertiesPanelVisible}"/>
+                <MenuItem Header="Show _Validation Panel" IsCheckable="True" IsChecked="{Binding IsValidationPanelVisible}"/>
+                <Separator/>
+                <MenuItem Header="Increase Font Size" Command="{Binding IncreaseFontSizeCommand}" InputGestureText="Ctrl++"/>
+                <MenuItem Header="Decrease Font Size" Command="{Binding DecreaseFontSizeCommand}" InputGestureText="Ctrl+-"/>
+                <MenuItem Header="Reset Font Size" Command="{Binding ResetFontSizeCommand}"/>
+            </MenuItem>
+            
+            <MenuItem Header="_Help" Foreground="#CCCCCC">
+                <MenuItem Header="_About JSON Schema Tool" Click="About_Click"/>
+            </MenuItem>
+        </Menu>
+
+        <!-- Toolbar -->
+        <Border Grid.Row="1" Background="#2D2D2D" Padding="8">
+            <WrapPanel>
+                <Button Content="📂 Open" Command="{Binding OpenFileCommand}" Style="{StaticResource ToolbarButton}" ToolTip="Open File (Ctrl+O)"/>
+                <Button Content="💾 Save" Command="{Binding SaveFileCommand}" Style="{StaticResource ToolbarButton}" ToolTip="Save File (Ctrl+S)"/>
+                <Separator Width="1" Background="#555555" Margin="8,0"/>
+                <Button Content="✓ Validate" Command="{Binding ValidateSchemaCommand}" Style="{StaticResource ToolbarButton}" ToolTip="Validate Schema (F5)"/>
+                <Button Content="📋 Check Data" Command="{Binding ValidateDataCommand}" Style="{StaticResource ToolbarButton}" ToolTip="Validate JSON Data against Schema"/>
+                <Separator Width="1" Background="#555555" Margin="8,0"/>
+                <Button Content="↩ Undo" Command="{Binding UndoCommand}" Style="{StaticResource ToolbarButton}" ToolTip="Undo (Ctrl+Z)"/>
+                <Button Content="↪ Redo" Command="{Binding RedoCommand}" Style="{StaticResource ToolbarButton}" ToolTip="Redo (Ctrl+Y)"/>
+                <Separator Width="1" Background="#555555" Margin="8,0"/>
+                <ToggleButton Content="☰ Flat View" IsChecked="{Binding IsFlatView}" 
+                              Style="{StaticResource ToolbarToggleButton}" ToolTip="Toggle Flat View"/>
+                <Separator Width="1" Background="#555555" Margin="8,0"/>
+                <Button Content="📝 Markdown" Command="{Binding ExportMarkdownCommand}" Style="{StaticResource ToolbarButton}" ToolTip="Export to Markdown"/>
+                <Separator Width="1" Background="#555555" Margin="8,0"/>
+                <ToggleButton Content="💾 Auto-save" IsChecked="{Binding IsAutoSaveEnabled}" 
+                              Style="{StaticResource ToolbarToggleButton}" ToolTip="Toggle Auto-save (3 seconds after last change)"/>
+            </WrapPanel>
+        </Border>
+
+        <!-- Main Content -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+                <ColumnDefinition Width="350" MinWidth="200"/>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="5"/>
+                <RowDefinition Height="150" MinHeight="50"/>
+            </Grid.RowDefinitions>
+
+            <!-- JSON Editor (Left Panel) -->
+            <Border Grid.Column="0" Grid.Row="0" Margin="4">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Border Grid.Row="0" Background="#252526" Padding="8,4">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📄 JSON Schema Editor" FontWeight="SemiBold" Foreground="#FFFFFF"/>
+                            <TextBlock Text=" - " Foreground="#808080"/>
+                            <TextBlock Text="{Binding CurrentFileName}" Foreground="#9CDCFE"/>
+                            <TextBlock Text=" *" Foreground="#F48771" 
+                                       Visibility="{Binding IsModified, Converter={StaticResource BoolToVisibility}}"/>
+                        </StackPanel>
+                    </Border>
+
+                    <avalonEdit:TextEditor 
+                        x:Name="JsonEditor"
+                        Grid.Row="1"
+                        FontFamily="Cascadia Code, Consolas, Courier New"
+                        FontSize="{Binding EditorFontSize}"
+                        Background="#1E1E1E"
+                        Foreground="#D4D4D4"
+                        ShowLineNumbers="True"
+                        SyntaxHighlighting="JavaScript"
+                        Padding="8"
+                        HorizontalScrollBarVisibility="Auto"
+                        VerticalScrollBarVisibility="Auto"/>
+                </Grid>
+            </Border>
+
+            <!-- Horizontal Splitter -->
+            <GridSplitter Grid.Column="0" Grid.Row="1" Height="5" HorizontalAlignment="Stretch" 
+                          Background="#3C3C3C" Visibility="{Binding IsValidationPanelVisible, Converter={StaticResource BoolToVisibility}}"/>
+
+            <!-- Validation Errors Panel (Bottom) -->
+            <Border Grid.Column="0" Grid.Row="2" Background="#252526" Margin="4,0,4,4"
+                    Visibility="{Binding IsValidationPanelVisible, Converter={StaticResource BoolToVisibility}}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <Border Grid.Row="0" Background="#2D2D2D" Padding="8,4">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="⚠ Validation Results" FontWeight="SemiBold" Foreground="#FFFFFF"/>
+                            <TextBlock Text=" (" Foreground="#808080"/>
+                            <TextBlock Text="{Binding ValidationErrors.Count}" Foreground="#F48771"/>
+                            <TextBlock Text=" issues)" Foreground="#808080"/>
+                        </StackPanel>
+                    </Border>
+
+                    <ListBox Grid.Row="1" 
+                             ItemsSource="{Binding ValidationErrors}"
+                             SelectedItem="{Binding SelectedValidationError}"
+                             Background="#1E1E1E" 
+                             BorderThickness="0"
+                             ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="4,2">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="⚠" Foreground="#F48771" Margin="0,0,8,0"/>
+                                    <TextBlock Grid.Column="1" Text="{Binding}" Foreground="#F48771" TextWrapping="Wrap"/>
+                                </Grid>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <!-- Vertical Splitter -->
+            <GridSplitter Grid.Column="1" Grid.RowSpan="3" Width="5" HorizontalAlignment="Stretch" 
+                          Background="#3C3C3C" Visibility="{Binding IsPropertiesPanelVisible, Converter={StaticResource BoolToVisibility}}"/>
+
+            <!-- Properties Panel (Right) -->
+            <Border Grid.Column="2" Grid.RowSpan="3" Background="#252526" Margin="0,4,4,4"
+                    Visibility="{Binding IsPropertiesPanelVisible, Converter={StaticResource BoolToVisibility}}">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <!-- Properties Header -->
+                    <Border Grid.Row="0" Background="#2D2D2D" Padding="8,4">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📋 Properties" FontWeight="SemiBold" Foreground="#FFFFFF"/>
+                            <TextBlock Text=" (" Foreground="#808080"/>
+                            <TextBlock Text="{Binding Properties.Count}" Foreground="#4EC9B0"/>
+                            <TextBlock Text=")" Foreground="#808080"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Properties DataGrid -->
+                    <DataGrid Grid.Row="1" 
+                              ItemsSource="{Binding Properties}"
+                              SelectedItem="{Binding SelectedProperty}"
+                              AutoGenerateColumns="False"
+                              Background="#1E1E1E"
+                              Foreground="#D4D4D4"
+                              BorderThickness="0"
+                              GridLinesVisibility="Horizontal"
+                              HorizontalGridLinesBrush="#3C3C3C"
+                              RowBackground="#1E1E1E"
+                              AlternatingRowBackground="#252526"
+                              HeadersVisibility="Column"
+                              SelectionMode="Single"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              IsReadOnly="False">
+                        <DataGrid.ColumnHeaderStyle>
+                            <Style TargetType="DataGridColumnHeader">
+                                <Setter Property="Background" Value="#2D2D2D"/>
+                                <Setter Property="Foreground" Value="#CCCCCC"/>
+                                <Setter Property="Padding" Value="8,4"/>
+                                <Setter Property="BorderBrush" Value="#3C3C3C"/>
+                                <Setter Property="BorderThickness" Value="0,0,1,1"/>
+                            </Style>
+                        </DataGrid.ColumnHeaderStyle>
+                        <DataGrid.CellStyle>
+                            <Style TargetType="DataGridCell">
+                                <Setter Property="Padding" Value="4"/>
+                                <Setter Property="BorderThickness" Value="0"/>
+                                <Style.Triggers>
+                                    <Trigger Property="IsSelected" Value="True">
+                                        <Setter Property="Background" Value="#094771"/>
+                                        <Setter Property="Foreground" Value="#FFFFFF"/>
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </DataGrid.CellStyle>
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="100" IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#9CDCFE"/>
+                                        <Setter Property="FontWeight" Value="SemiBold"/>
+                                        <Setter Property="Padding" Value="4"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Type" Binding="{Binding DataType}" Width="70" IsReadOnly="True">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#4EC9B0"/>
+                                        <Setter Property="Padding" Value="4"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                            </DataGridTextColumn>
+                            <DataGridTextColumn Header="Description" Binding="{Binding Description, UpdateSourceTrigger=PropertyChanged}" Width="*">
+                                <DataGridTextColumn.ElementStyle>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Foreground" Value="#D4D4D4"/>
+                                        <Setter Property="Padding" Value="4"/>
+                                        <Setter Property="TextTrimming" Value="CharacterEllipsis"/>
+                                    </Style>
+                                </DataGridTextColumn.ElementStyle>
+                                <DataGridTextColumn.EditingElementStyle>
+                                    <Style TargetType="TextBox">
+                                        <Setter Property="Background" Value="#2D2D2D"/>
+                                        <Setter Property="Foreground" Value="#FFFFFF"/>
+                                        <Setter Property="BorderThickness" Value="0"/>
+                                        <Setter Property="Padding" Value="4"/>
+                                    </Style>
+                                </DataGridTextColumn.EditingElementStyle>
+                            </DataGridTextColumn>
+                        </DataGrid.Columns>
+                    </DataGrid>
+
+                    <!-- Property Editor Panel -->
+                    <Border Grid.Row="2" Background="#2D2D2D" Padding="12" 
+                            Visibility="{Binding HasSelectedProperty, Converter={StaticResource BoolToVisibility}}">
+                        <StackPanel>
+                            <TextBlock Text="✏ Edit Property" FontWeight="Bold" Foreground="#FFFFFF" 
+                                       Margin="0,0,0,12" FontSize="14"/>
+
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="Auto"/>
+                                </Grid.RowDefinitions>
+
+                                <TextBlock Grid.Row="0" Grid.Column="0" Text="Name:" Style="{StaticResource LabelStyle}" VerticalAlignment="Center"/>
+                                <TextBox Grid.Row="0" Grid.Column="1" Text="{Binding SelectedProperty.Name, Mode=OneWay}" 
+                                         Style="{StaticResource InputStyle}" IsReadOnly="True" Opacity="0.7"/>
+
+                                <TextBlock Grid.Row="1" Grid.Column="0" Text="Type:" Style="{StaticResource LabelStyle}" VerticalAlignment="Center"/>
+                                <ComboBox Grid.Row="1" Grid.Column="1" 
+                                          ItemsSource="{Binding AvailableTypes}"
+                                          SelectedItem="{Binding SelectedProperty.DataType, Mode=TwoWay}"
+                                          IsEditable="True"
+                                          Text="{Binding SelectedProperty.DataType, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          Style="{StaticResource ComboStyle}"/>
+
+                                <TextBlock Grid.Row="2" Grid.Column="0" Text="Format:" Style="{StaticResource LabelStyle}" VerticalAlignment="Center"/>
+                                <ComboBox Grid.Row="2" Grid.Column="1" 
+                                          ItemsSource="{Binding AvailableFormats}"
+                                          SelectedItem="{Binding SelectedProperty.Format, Mode=TwoWay}"
+                                          IsEditable="True"
+                                          Text="{Binding SelectedProperty.Format, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                          Style="{StaticResource ComboStyle}"/>
+
+                                <TextBlock Grid.Row="3" Grid.Column="0" Text="Description:" Style="{StaticResource LabelStyle}" VerticalAlignment="Top"/>
+                                <TextBox Grid.Row="3" Grid.Column="1" 
+                                         Text="{Binding SelectedProperty.Description, UpdateSourceTrigger=PropertyChanged}" 
+                                         Style="{StaticResource InputStyle}" 
+                                         TextWrapping="Wrap" AcceptsReturn="True" Height="50"/>
+
+                                <TextBlock Grid.Row="4" Grid.Column="0" Text="Examples:" Style="{StaticResource LabelStyle}" VerticalAlignment="Top"/>
+                                <TextBox Grid.Row="4" Grid.Column="1" 
+                                         Text="{Binding SelectedProperty.Example, UpdateSourceTrigger=PropertyChanged}" 
+                                         Style="{StaticResource InputStyle}"
+                                         TextWrapping="Wrap" AcceptsReturn="True" Height="40"
+                                         ToolTip="Multiple examples separated by comma or newline"/>
+                            </Grid>
+
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
+                                <Button Content="Apply" Command="{Binding ApplyPropertyChangesCommand}" 
+                                        Style="{StaticResource ToolbarButton}" Width="80"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="3" Background="#007ACC" Padding="8,4">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0" Text="{Binding StatusMessage}" Foreground="#FFFFFF"/>
+                
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="16,0">
+                    <TextBlock Text="Properties: " Foreground="#FFFFFF" Opacity="0.7"/>
+                    <TextBlock Text="{Binding Properties.Count}" Foreground="#FFFFFF"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="16,0">
+                    <TextBlock Text="Undo: " Foreground="#FFFFFF" Opacity="0.7"/>
+                    <TextBlock Text="{Binding UndoCount}" Foreground="#FFFFFF"/>
+                    <TextBlock Text=" / Redo: " Foreground="#FFFFFF" Opacity="0.7"/>
+                    <TextBlock Text="{Binding RedoCount}" Foreground="#FFFFFF"/>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="3" Orientation="Horizontal" Margin="16,0">
+                    <TextBlock Text="Auto-save: " Foreground="#FFFFFF" Opacity="0.7"/>
+                    <TextBlock Foreground="#FFFFFF">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="OFF"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsAutoSaveEnabled}" Value="True">
+                                        <Setter Property="Text" Value="ON"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+                
+                <StackPanel Grid.Column="4" Orientation="Horizontal" Margin="16,0,0,0">
+                    <TextBlock Text="Modified: " Foreground="#FFFFFF" Opacity="0.7"/>
+                    <TextBlock Foreground="#FFFFFF">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Text" Value="No"/>
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsModified}" Value="True">
+                                        <Setter Property="Text" Value="Yes"/>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
