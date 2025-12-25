@@ -1,0 +1,96 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "User Profile",
+  "description": "A schema for user profile data",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "integer",
+      "description": "Unique identifier for the user",
+      "example": 12345
+    },
+    "username": {
+      "type": "string",
+      "description": "User's login name",
+      "example": "john_doe",
+      "minLength": 3,
+      "maxLength": 50
+    },
+    "email": {
+      "type": "string",
+      "description": "User's email address",
+      "format": "email",
+      "example": "john@example.com"
+    },
+    "profile": {
+      "type": "object",
+      "description": "User's profile information",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "description": "User's first name",
+          "example": "John"
+        },
+        "lastName": {
+          "type": "string",
+          "description": "User's last name",
+          "example": "Doe"
+        },
+        "birthDate": {
+          "type": "string",
+          "format": "date",
+          "description": "User's date of birth",
+          "example": "1990-01-15"
+        },
+        "avatar": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to user's avatar image"
+        }
+      },
+      "required": ["firstName", "lastName"]
+    },
+    "roles": {
+      "type": "array",
+      "description": "List of user roles",
+      "items": {
+        "type": "string",
+        "enum": ["admin", "user", "moderator", "guest"]
+      },
+      "example": ["user", "moderator"]
+    },
+    "settings": {
+      "type": "object",
+      "description": "User preferences",
+      "properties": {
+        "theme": {
+          "type": "string",
+          "enum": ["light", "dark", "auto"],
+          "default": "auto",
+          "description": "UI theme preference"
+        },
+        "notifications": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable email notifications"
+        },
+        "language": {
+          "type": "string",
+          "description": "Preferred language code",
+          "example": "en-US"
+        }
+      }
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Account creation timestamp"
+    },
+    "isActive": {
+      "type": "boolean",
+      "description": "Whether the account is active",
+      "default": true
+    }
+  },
+  "required": ["id", "username", "email"]
+}
