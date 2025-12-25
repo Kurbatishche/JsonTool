@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  JSON Syntax Highlighting Definition for AvalonEdit
+  Кольори у стилі VS Code Dark Theme:
+  - Ключі: блакитний (#9CDCFE)
+  - Рядки: оранжевий (#CE9178)
+  - Числа: зелений (#B5CEA8)
+  - Boolean: фіолетовий (#569CD6)
+  - null: сірий (#808080)
+  - Дужки: жовтий (#FFD700)
+-->
+<SyntaxDefinition name="JSON" extensions=".json"
+                  xmlns="http://icsharpcode.net/sharpdevelop/syntaxdefinition/2008">
+  
+  <!-- Кольори -->
+  <Color name="Key" foreground="#9CDCFE" fontWeight="normal"/>
+  <Color name="String" foreground="#CE9178"/>
+  <Color name="Number" foreground="#B5CEA8"/>
+  <Color name="Boolean" foreground="#569CD6" fontWeight="bold"/>
+  <Color name="Null" foreground="#808080" fontStyle="italic"/>
+  <Color name="Brackets" foreground="#FFD700"/>
+  <Color name="Colon" foreground="#CCCCCC"/>
+  <Color name="Comma" foreground="#CCCCCC"/>
+  <Color name="Comment" foreground="#6A9955" fontStyle="italic"/>
+  <Color name="Error" foreground="#F44747" background="#3C1818"/>
+  
+  <RuleSet ignoreCase="false">
+    
+    <!-- Коментарі (JSON5 / JSONC style) -->
+    <Span color="Comment" begin="//" />
+    <Span color="Comment" multiline="true" begin="/\*" end="\*/" />
+    
+    <!-- Ключі об'єкта (рядок перед двокрапкою) -->
+    <Rule color="Key">
+      "(?:[^"\\]|\\.)*"\s*(?=:)
+    </Rule>
+    
+    <!-- Рядкові значення -->
+    <Span color="String">
+      <Begin>"</Begin>
+      <End>"</End>
+      <RuleSet>
+        <!-- Escape sequences -->
+        <Rule foreground="#D7BA7D">
+          \\["\\/bfnrt]|\\u[0-9a-fA-F]{4}
+        </Rule>
+      </RuleSet>
+    </Span>
+    
+    <!-- Boolean значення -->
+    <Keywords color="Boolean">
+      <Word>true</Word>
+      <Word>false</Word>
+    </Keywords>
+    
+    <!-- null -->
+    <Keywords color="Null">
+      <Word>null</Word>
+    </Keywords>
+    
+    <!-- Числа (цілі, дробові, експоненціальні, від'ємні) -->
+    <Rule color="Number">
+      -?(?:0|[1-9]\d*)(?:\.\d+)?(?:[eE][+-]?\d+)?
+    </Rule>
+    
+    <!-- Дужки -->
+    <Rule color="Brackets">
+      [\[\]{}]
+    </Rule>
+    
+    <!-- Двокрапка -->
+    <Rule color="Colon">
+      :
+    </Rule>
+    
+    <!-- Кома -->
+    <Rule color="Comma">
+      ,
+    </Rule>
+    
+  </RuleSet>
+</SyntaxDefinition>
