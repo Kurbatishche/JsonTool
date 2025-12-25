@@ -14,8 +14,6 @@
     <Window.InputBindings>
         <KeyBinding Key="O" Modifiers="Ctrl" Command="{Binding OpenFileCommand}"/>
         <KeyBinding Key="S" Modifiers="Ctrl" Command="{Binding SaveFileCommand}"/>
-        <KeyBinding Key="Z" Modifiers="Ctrl" Command="{Binding UndoCommand}"/>
-        <KeyBinding Key="Y" Modifiers="Ctrl" Command="{Binding RedoCommand}"/>
         <KeyBinding Key="F5" Command="{Binding ValidateSchemaCommand}"/>
     </Window.InputBindings>
     
@@ -236,8 +234,8 @@
                 <Button Content="✓ Validate" Command="{Binding ValidateSchemaCommand}" Style="{StaticResource ToolbarButton}" ToolTip="Validate Schema (F5)"/>
                 <Button Content="📋 Check Data" Command="{Binding ValidateDataCommand}" Style="{StaticResource ToolbarButton}" ToolTip="Validate JSON Data against Schema"/>
                 <Separator Width="1" Background="#555555" Margin="8,0"/>
-                <Button Content="↩ Undo" Command="{Binding UndoCommand}" Style="{StaticResource ToolbarButton}" ToolTip="Undo (Ctrl+Z)"/>
-                <Button Content="↪ Redo" Command="{Binding RedoCommand}" Style="{StaticResource ToolbarButton}" ToolTip="Redo (Ctrl+Y)"/>
+                <Button Content="↩ Undo" Click="Undo_Click" Style="{StaticResource ToolbarButton}" ToolTip="Undo (Ctrl+Z)"/>
+                <Button Content="↪ Redo" Click="Redo_Click" Style="{StaticResource ToolbarButton}" ToolTip="Redo (Ctrl+Y)"/>
                 <Separator Width="1" Background="#555555" Margin="8,0"/>
                 <ToggleButton Content="☰ Flat View" IsChecked="{Binding IsFlatView}" 
                               Style="{StaticResource ToolbarToggleButton}" ToolTip="Toggle Flat View"/>

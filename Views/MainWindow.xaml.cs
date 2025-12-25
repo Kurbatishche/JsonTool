@@ -134,4 +134,20 @@ public partial class MainWindow : Window
             MessageBoxButton.OK,
             MessageBoxImage.Information);
     }
+
+    private void Undo_Click(object sender, RoutedEventArgs e)
+    {
+        if (JsonEditor.CanUndo)
+        {
+            JsonEditor.Undo();
+        }
+    }
+
+    private void Redo_Click(object sender, RoutedEventArgs e)
+    {
+        if (JsonEditor.CanRedo)
+        {
+            JsonEditor.Redo();
+        }
+    }
 }
